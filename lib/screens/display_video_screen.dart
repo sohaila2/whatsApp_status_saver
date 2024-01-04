@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_api/flutter_native_api.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -11,7 +12,6 @@ import 'package:whatsapp_status_saver/constants/constants.dart';
 import '../provider/get_status_provider.dart';
 import '../provider/image_path.dart';
 import '../provider/theme_provider.dart';
-import '../widgets/share_widget.dart';
 
 class DisplayVideoScreen extends StatefulWidget {
   const DisplayVideoScreen({super.key, required this.videopath});
@@ -63,86 +63,92 @@ class _DisplayVideoScreenState extends State<DisplayVideoScreen> {
             ? Theme.of(context).scaffoldBackgroundColor
             :
         Color(0xffDFDFDF),
-        body: Column(
-          children: [
-            Container(
-                width: 300,
-                height: 120,
-                child: Row(
-                  children: [
-                    Text("Status Saver"),
-                    Spacer(),
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-
-                        if (value == 'light') {
-                          themeProvider.setLightTheme();
-                        } else if (value == 'dark') {
-                          themeProvider.setDarkTheme();
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return ['light', 'dark'].map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice == 'light' ? 'Light Theme' : 'Dark Theme'),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                )
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: 80,
+          backgroundColor: Colors.transparent,
+          title: Text(
+            "Status Saver",
+            style: TextStyle(
+                fontSize: 24
             ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: themeProvider.getTheme() == ThemeData.dark()
-                        ? Theme.of(context).scaffoldBackgroundColor
-                        :
-                    Colors.white,
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                  border: Border.all(
-                    color: navColor,
-                    width: 2.0,
-                  ),
-                ),
-                child:
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(onPressed: (){
-                            Navigator.pop(context);
-                          }, icon: Icon(Icons.arrow_back_ios),),
-                          Text("Back"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        height: 340,
-                        width: 320,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: FileImage(File(widget.videopath!)),
-                              fit: BoxFit.fill
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.all(Radius.circular(16)),
-                          child: Chewie(
-                            controller: _chewieController!,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
+          ),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
+
+                if (value == 'light') {
+                  themeProvider.setLightTheme();
+                } else if (value == 'dark') {
+                  themeProvider.setDarkTheme();
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return ['light', 'dark'].map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice == 'light' ? 'Light Theme' : 'Dark Theme'),
+                  );
+                }).toList();
+              },
+            ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: themeProvider.getTheme() == ThemeData.dark()
+                          ? Theme.of(context).scaffoldBackgroundColor
+                          :
+                      Colors.white,
+                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    border: Border.all(
+                      color: navColor,
+                      width: 2.0,
+                    ),
+                  ),
+                  child:
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(onPressed: (){
+                              Navigator.pop(context);
+                            }, icon: Icon(Icons.arrow_back_ios),),
+                            Text("Back"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 340,
+                          width: 320,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: FileImage(File(widget.videopath!)),
+                                fit: BoxFit.fill
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            child: Chewie(
+                              controller: _chewieController!,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
 
         bottomNavigationBar: BottomNavigationBar(
@@ -163,7 +169,7 @@ class _DisplayVideoScreenState extends State<DisplayVideoScreen> {
                 log("download image");
                 ImageGallerySaver.saveFile(widget.videopath!).then((value) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Image saved")),
+                    const SnackBar(content: Text("video saved")),
                   );
                   imagePathsProvider.addVideoPath(widget.videopath!);
                   imagePathsProvider.saveVideoPathsToSharedPreferences();
@@ -208,12 +214,8 @@ class _DisplayVideoScreenState extends State<DisplayVideoScreen> {
                 break;
 
               case 2:
-                log("share");
-                showDialog(context: context,
-                    builder: (BuildContext context){
-                      return const ShareAlertDialog();
-                    }
-                );
+                FlutterNativeApi.shareImage(widget.videopath!);
+
                 break;
             }
           },

@@ -35,32 +35,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_controller!.value.isInitialized) {
-      return Container();
-    }
-    return GestureDetector(
-      onTap: (){
-
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          AspectRatio(
-            aspectRatio: _controller!.value.aspectRatio,
-            child: VideoPlayer(_controller!),
-          ),
-          const Positioned.fill(
-            child: Align(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.play_arrow,
-                size: 54,
-                color: Colors.white,
-              ),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AspectRatio(
+          aspectRatio: _controller!.value.aspectRatio,
+          child: VideoPlayer(_controller!),
+        ),
+        const Positioned.fill(
+          child: Align(
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.play_arrow,
+              size: 54,
+              color: Colors.white,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

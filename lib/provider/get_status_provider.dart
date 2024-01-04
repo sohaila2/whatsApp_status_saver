@@ -47,8 +47,10 @@ class GetStatusProvider extends ChangeNotifier {
       }
     }
   }
+
   void removeImage(String imagePath) {
     _getImages.removeWhere((image) => image.path == imagePath);
     notifyListeners();
   }
+
 }

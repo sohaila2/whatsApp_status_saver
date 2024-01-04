@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_native_api/flutter_native_api.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +11,6 @@ import 'package:whatsapp_status_saver/constants/constants.dart';
 import '../provider/get_status_provider.dart';
 import '../provider/image_path.dart';
 import '../provider/theme_provider.dart';
-import '../widgets/share_widget.dart';
 import 'saved_screen.dart';
 import '../services/url_service.dart';
 
@@ -38,83 +38,88 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
         backgroundColor: themeProvider.getTheme() == ThemeData.dark()
           ? Theme.of(context).scaffoldBackgroundColor
           : Color(0xffDFDFDF),
-        body: Column(
-          children: [
-            Container(
-                width: 300,
-                height: 120,
-                child: Row(
-                  children: [
-                    Text("Status Saver"),
-                    Spacer(),
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-
-                        if (value == 'light') {
-                          themeProvider.setLightTheme();
-                        } else if (value == 'dark') {
-                          themeProvider.setDarkTheme();
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return ['light', 'dark'].map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice == 'light' ? 'Light Theme' : 'Dark Theme'),
-                          );
-                        }).toList();
-                      },
-                    ),
-
-                  ],
-                )
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: 80,
+          backgroundColor: Colors.transparent,
+          title: Text(
+            "Status Saver",
+            style: TextStyle(
+                fontSize: 24
             ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: themeProvider.getTheme() == ThemeData.dark()
-                      ? Theme.of(context).scaffoldBackgroundColor
-                      :
-                  Colors.white,
+          ),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
 
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: Color(0xff003B26
-                      ),
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(onPressed: (){
-                          Navigator.pop(context);
-                        }, icon: Icon(Icons.arrow_back_ios),),
-                        Text("Back"),
-                      ],
-                    ),
-                   SizedBox(
-                     height: 20,
-                   ),
-                    Container(
-                      height: 340,
-                      width: 320,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: FileImage(File(widget.imagePath!)),
-                          fit: BoxFit.fill
-                        ),
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
-                      ),
-                    )
-                  ],
-                ),
-              ),
+                if (value == 'light') {
+                  themeProvider.setLightTheme();
+                } else if (value == 'dark') {
+                  themeProvider.setDarkTheme();
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return ['light', 'dark'].map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice == 'light' ? 'Light Theme' : 'Dark Theme'),
+                  );
+                }).toList();
+              },
             ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: themeProvider.getTheme() == ThemeData.dark()
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        :
+                    Colors.white,
+
+                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    border: Border.symmetric(
+                      horizontal: BorderSide(
+                        color: Color(0xff003B26
+                        ),
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(onPressed: (){
+                            Navigator.pop(context);
+                          }, icon: Icon(Icons.arrow_back_ios),),
+                          Text("Back"),
+                        ],
+                      ),
+                     SizedBox(
+                       height: 20,
+                     ),
+                      Container(
+                        height: 340,
+                        width: 320,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(File(widget.imagePath!)),
+                            fit: BoxFit.fill
+                          ),
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: navColor,
@@ -133,7 +138,7 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
 
                 log("download image");
                 ImageGallerySaver.saveFile(widget.imagePath!).then((value) async {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Image saved")));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("image saved")));
                   imagePathsProvider.addImagePath(widget.imagePath!);
                   imagePathsProvider.saveImagePathsToSharedPreferences();
                 });
@@ -177,11 +182,7 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
       
               case 2:
                 log("share");
-                showDialog(context: context,
-                    builder: (BuildContext context){
-                    return const ShareAlertDialog();
-                    }
-                );
+                FlutterNativeApi.shareImage(widget.imagePath!);
                 break;
             }
           },

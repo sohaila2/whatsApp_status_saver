@@ -127,14 +127,14 @@ class _SavedScreenState extends State<SavedScreen> {
                                           ),
                                         );
                                       } else {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (_) => DisplayVideoScreen(
-                                        //       videopath: filePath,
-                                        //     ),
-                                        //   ),
-                                        // );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => DisplayVideoScreen(
+                                              videopath: filePath,
+                                            ),
+                                          ),
+                                        );
                                       }
                                     },
                                     child: mediaWidget,
